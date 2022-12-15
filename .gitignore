@@ -36,7 +36,15 @@
 *.xcworkspace
 *.sln
 *.suo
+Binaries
+DerivedDataCache
+Intermediate
+Saved
+.vscode
+.vs
+*.VC.db
 *.opensdf
+*.opendb
 *.sdf
 *.VC.db
 *.VC.opendb
@@ -72,3 +80,7 @@ Plugins/*/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+*.sln
+*.suo
+*.xcodeproj
+*.xcworkspace
