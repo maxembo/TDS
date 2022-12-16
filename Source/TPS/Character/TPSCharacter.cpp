@@ -12,6 +12,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Engine/World.h"
+#include "TPS/Game/TPSPlayerController.h"
 
 ATPSCharacter::ATPSCharacter()
 {
@@ -62,6 +63,7 @@ void ATPSCharacter::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
 
+	
 	if (CursorToWorld != nullptr)
 	{
 		if (UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayEnabled())
@@ -115,7 +117,6 @@ void ATPSCharacter::MovementTick(float DeltaTime)
 	AddMovementInput(FVector(1.0f,0.0f,0.0f),AxisX);
 	AddMovementInput(FVector(0.0f,1.0f,0.0f),AxisY);
 	
-	Mouse();
 }
 
 void ATPSCharacter::CharacterUpdate()
@@ -191,6 +192,8 @@ void ATPSCharacter::Mouse()
 		SetActorRotation(FQuat(FRotator(0.0f,FindRotatorResultYaw,0.0f)));
 	}
 }
+
+
 
 
 

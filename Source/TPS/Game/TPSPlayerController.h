@@ -37,6 +37,12 @@ protected:
 	/** Input handlers for SetDestination action. */
 	void OnSetDestinationPressed();
 	void OnSetDestinationReleased();
+
+	bool GetMousePlanePosition(FVector& IntersectVector);
+
+	bool GetMouseScreenPosition(FVector2D& ScreenPosition,FVector& IntersectVector);
+
+	void AimingUsingMouseCursor();
 };
 
 

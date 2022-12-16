@@ -1,10 +1,14 @@
 
 #include "TPSPlayerController.h"
+
+#include "DrawDebugHelpers.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "../Character/TPSCharacter.h"
 #include "Engine/World.h"
+#include "GameFramework/HUD.h"
+#include "Kismet/GameplayStatics.h"
 
 ATPSPlayerController::ATPSPlayerController()
 {
@@ -17,11 +21,13 @@ void ATPSPlayerController::PlayerTick(float DeltaTime)
 	Super::PlayerTick(DeltaTime);
 
 	// keep updating the destination every tick while desired
-	if (bMoveToMouseCursor)
+	/*if (bMoveToMouseCursor)
 	{
 		MoveToMouseCursor();
-	}
+	}*/
+	AimingUsingMouseCursor();
 }
+
 
 void ATPSPlayerController::SetupInputComponent()
 {
@@ -108,4 +114,80 @@ void ATPSPlayerController::OnSetDestinationReleased()
 {
 	// clear flag to indicate we should stop updating the destination
 	bMoveToMouseCursor = false;
+}
+
+bool ATPSPlayerController::GetMousePlanePosition(FVector& IntersectVector)
+{
+	ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(Player);
+	bool bHit = false;
+	if(LocalPlayer && LocalPlayer->ViewportClient)
+	{
+		FVector2D MousePosition;
+		if(LocalPlayer->ViewportClient->GetMousePosition(MousePosition))
+		{
+			bHit = GetMouseScreenPosition(MousePosition,IntersectVector);
+		}
+	}
+
+	if(!bHit)
+	{
+		IntersectVector = FVector::ZeroVector;
+	}
+	return bHit;
+}
+
+bool ATPSPlayerController::GetMouseScreenPosition(FVector2D& ScreenPosition, FVector& IntersectVector)
+{
+	if(GetHUD() != NULL && GetHUD()->GetHitBoxAtCoordinates(ScreenPosition,true))
+	{
+		return false;
+	}
+
+	FVector WorldOrigin;
+	FVector WorldDirection;
+	if(UGameplayStatics::DeprojectScreenToWorld(this,ScreenPosition,WorldOrigin,WorldDirection) == true)
+	{
+		IntersectVector = FMath::LinePlaneIntersection(WorldOrigin,
+														WorldOrigin + WorldDirection * HitResultTraceDistance,
+													GetPawn()->GetActorLocation(),
+													FVector::UpVector);
+		return true;
+	}
+	return false;
+}
+
+void ATPSPlayerController::AimingUsingMouseCursor()
+{
+	if(!bMoveToMouseCursor)
+	{
+		return;
+	}
+	ATPSPlayerController* MyPawn = Cast<ATPSPlayerController>(GetPawn());
+	if(MyPawn == nullptr)
+	{
+		return;
+	}
+	
+	FVector PawnLoc = GetPawn()->GetActorLocation();
+	FHitResult OutTraceResult;
+	FVector IntersectVector;
+	GetMousePlanePosition(IntersectVector);
+
+	FCollisionQueryParams CollisionQueryParams("MouseAimingTrace",true);
+	bool bHit = GetWorld()->LineTraceSingleByChannel(OutTraceResult,IntersectVector,IntersectVector - FVector::UpVector * HitResultTraceDistance,ECC_Pawn,CollisionQueryParams);
+
+	FVector Direction = FVector::ZeroVector;
+	FVector Location = bHit ? OutTraceResult.ImpactPoint:IntersectVector;
+
+	if(Location != FVector::ZeroVector)
+	{
+		Direction = Location -PawnLoc;
+
+		DrawDebugLine(GetWorld(),PawnLoc,Location,FColor(255,255,0),false,-1,0,10.0f);
+		if(bHit)
+		{
+			DrawDebugLine(GetWorld(),PawnLoc,Location,FColor(255,255,0),false,-1,0,10.0f);
+
+		}
+	}
 }
