@@ -52,16 +52,22 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	bool AimEnabled = false;
 
-	
+	float minRun = MovementInfo.RunSpeedNormal;
+	float maxRun = MovementInfo.SprintRunSpeed;
+	float damageRun = 1.f;
 	UFUNCTION()
 	void InputAxisY(float value);
 
 	UFUNCTION()
 	void InputAxisX(float value);
 
+	UPROPERTY()
 	float AxisX = 0.0f;
 	float AxisY = 0.0f;
-
+	
+	UPROPERTY()
+	FTimerHandle TimerHandle;
+	
 	//Tick Function
 	UFUNCTION()
 	void MovementTick(float DeltaTime);
@@ -74,5 +80,9 @@ public:
 
 	void Mouse();
 
+	void AccelerationCharacter();
+
+	void FatigueCharacter();
+	
 };
 

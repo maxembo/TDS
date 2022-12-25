@@ -147,7 +147,7 @@ void ATPSCharacter::ChangeMovementState()
 		{
 			WalkEnabled = false;
 			AimEnabled = false;
-			MovementState = EMovementState::SprintRunState;
+			AccelerationCharacter();
 		}
 		else
 		{
@@ -190,6 +190,37 @@ void ATPSCharacter::Mouse()
 		float FindRotatorResultYaw = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(),mouse).Yaw;
 		SetActorRotation(FQuat(FRotator(0.0f,FindRotatorResultYaw,0.0f)));
 	}
+}
+
+void ATPSCharacter::AccelerationCharacter()
+{
+	if(SprintRunEnabled)
+	{
+		MovementState = EMovementState::SprintRunState;
+		GetWorldTimerManager().SetTimer(TimerHandle, this, &ATPSCharacter::FatigueCharacter, 0.1f, true);
+	}
+}
+
+void ATPSCharacter::FatigueCharacter()
+{
+	if(minRun <= maxRun && SprintRunEnabled)
+	{
+		maxRun -= damageRun;
+		MovementInfo.SprintRunSpeed = maxRun;
+	}
+	if(!SprintRunEnabled || minRun >= maxRun)
+	{
+		maxRun += damageRun;
+		MovementState = EMovementState::RunState;
+		if( maxRun == 800.f)
+		{
+			GetWorldTimerManager().ClearTimer(TimerHandle);
+		}
+	}
+	GetCharacterMovement()->MaxWalkSpeed = maxRun;
+	CharacterUpdate();
+	/*FString TheFloatStr = FString::SanitizeFloat(maxRun);
+	GEngine->AddOnScreenDebugMessage( -1,1.0,FColor::Red, *TheFloatStr );*/
 }
 
 
