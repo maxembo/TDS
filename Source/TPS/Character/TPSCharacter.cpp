@@ -211,7 +211,7 @@ void ATPSCharacter::FatigueCharacter()
 	if(!SprintRunEnabled || minRun >= maxRun)
 	{
 		maxRun += damageRun;
-		MovementState = EMovementState::RunState;
+		
 		if( maxRun == 800.f)
 		{
 			GetWorldTimerManager().ClearTimer(TimerHandle);
