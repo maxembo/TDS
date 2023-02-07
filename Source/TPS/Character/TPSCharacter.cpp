@@ -134,7 +134,6 @@ void ATPSCharacter::CharacterUpdate()
 	GetCharacterMovement()->MaxWalkSpeed = ResSpeed;
 }
 
-
 void ATPSCharacter::ChangeMovementState()
 {
 	if(!WalkEnabled && !SprintRunEnabled && !AimEnabled)

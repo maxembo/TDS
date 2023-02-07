@@ -63,6 +63,7 @@ public:
 
 	UPROPERTY()
 	float AxisX = 0.0f;
+	
 	float AxisY = 0.0f;
 	
 	UPROPERTY()
